@@ -4,6 +4,7 @@ import org.newdawn.slick.Animation;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 
 import Entities.AddedTiles.DirtTile;
@@ -19,6 +20,8 @@ public class HiveBoy extends Entity{
 	private SpriteSheet backSheet, forwardSheet, leftSheet, rightSheet;
 	private Image backStill, forwardStill, leftStill, rightStill, currentStill;
 	private Animation backWalk, forwardWalk, leftWalk, rightWalk, currentAnimation;
+	private Sound step;
+	private long stepCounter = 0;
 	
 
 	
