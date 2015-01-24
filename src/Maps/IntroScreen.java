@@ -39,8 +39,8 @@ public class IntroScreen extends BasicGameState{
 		backgroundScreen = new Image("resources/images/startScreen.png");
 
 		// Initializes intro screen sounds
-		choose = new Sound("resources/sounds/choose.wav");
-		selected = new Sound("resources/sounds/selected.wav");
+		choose = new Sound("resources/sounds/introScreen/choose.wav");
+		selected = new Sound("resources/sounds/introScreen/selected.wav");
 
 	}
 
