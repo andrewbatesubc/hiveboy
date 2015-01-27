@@ -15,7 +15,7 @@ public class BeeBox extends Entity{
 		setY(y);
 		this.mainMap = mainMap;
 		try {
-			hiveImage = new Image("resources/spritesheets/hive.png");
+			hiveImage = new Image("resources/images/hive/hive.png");
 			hiveImage.setFilter(Image.FILTER_NEAREST);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block

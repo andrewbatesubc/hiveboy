@@ -18,13 +18,14 @@ import Entities.AddedTiles.AddedTile;
 import Entities.AddedTiles.DirtTile;
 
 public class MainMap extends BasicGameState{
-	
+
 	private HiveBoy hiveBoy;
 	private Bee bee;
 	private BeeBox beeBox;
 	private TiledMap tiledMap;
 	private Camera camera;
 	private ArrayList<AddedTile> addedTiles;
+	private int timer = 0;
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -38,37 +39,31 @@ public class MainMap extends BasicGameState{
 		container.setUpdateOnlyWhenVisible(false);
 		tiledMap.getLayerIndex("collision");
 		addedTiles = new ArrayList<AddedTile>();
-		
+
 
 	}
 
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
-		// draws hiveboy
 		camera.drawMap();
-		//camera.drawMap(0);
-		//camera.drawMap(2);
-		//camera.drawMap(3);
-		//camera.drawMap(4);
 		camera.translateGraphics();
-		//camera.drawMap(1);
-		
-	
+
+
 		for(AddedTile tile : addedTiles){
 			tile.getImage().draw(tile.getX(), tile.getY());
 		}
-		if(hiveBoy.getDx() == 0 && hiveBoy.getDy() == 0)
+		if(hiveBoy.getDx() == 0 && hiveBoy.getDy() == 0 && !hiveBoy.getDig())
 			hiveBoy.getCurrentStill().draw(hiveBoy.getX(), hiveBoy.getY(), hiveBoy.getScale());
-	
+
 		else 	hiveBoy.getCurrentAnimation().draw(hiveBoy.getX(), hiveBoy.getY(), 
 				hiveBoy.getCurrentAnimation().getWidth()*hiveBoy.getScale(), 
 				hiveBoy.getCurrentAnimation().getHeight()*hiveBoy.getScale());
-		
+
 		bee.getCurrentAnimation().draw(bee.getX(), bee.getY());
 		beeBox.getImage().draw(beeBox.getX(), beeBox.getY(), 2);
-		
-	
+
+
 	}
 
 	@Override
@@ -79,46 +74,49 @@ public class MainMap extends BasicGameState{
 
 		// Handles input
 		Input input = container.getInput();
-		
+
 		// Key left
 		if(input.isKeyDown(Input.KEY_LEFT)){
 			hiveBoy.setLeft(true);
 			hiveBoy.setFacing(2);
 		}
-			else hiveBoy.setLeft(false);
-		
+		else hiveBoy.setLeft(false);
+
 		// Key right 
 		if(input.isKeyDown(Input.KEY_RIGHT)){
 			hiveBoy.setRight(true);
 			hiveBoy.setFacing(3);
 		}
-			else hiveBoy.setRight(false);
-		
+		else hiveBoy.setRight(false);
+
 		// Key down 
 		if(input.isKeyDown(Input.KEY_DOWN)){
 			hiveBoy.setDown(true);
 			hiveBoy.setFacing(1);
 		}
-			else hiveBoy.setDown(false);
-		
+		else hiveBoy.setDown(false);
+
 		// Key up 
 		if(input.isKeyDown(Input.KEY_UP)){
 			hiveBoy.setUp(true);
 			hiveBoy.setFacing(0);
 		}
-			else hiveBoy.setUp(false);
+		else hiveBoy.setUp(false);
+
 		// Key space
-		if(input.isKeyPressed(Input.KEY_SPACE))
+		if(input.isKeyPressed(Input.KEY_SPACE)){
 			hiveBoy.pressedSpace();
-		
-		
+		}
+
+
+
 		// Ticks hiveboy
 		hiveBoy.tick();
 		camera.centerOn(hiveBoy.getX(), hiveBoy.getY());
-		
-		
-		
-		
+
+
+
+
 	}
 
 	public TiledMap getTiledMap(){return tiledMap;}
@@ -128,7 +126,7 @@ public class MainMap extends BasicGameState{
 		// TODO Auto-generated method stub
 		return 1;
 	}
-	
-	
+
+
 
 }

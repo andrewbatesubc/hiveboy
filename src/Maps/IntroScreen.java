@@ -31,11 +31,11 @@ public class IntroScreen extends BasicGameState{
 		// Keeps game updating when out of focus
 		container.setUpdateOnlyWhenVisible(false);
 		// Initializes all start screen images
-		startSelected = new Image("resources/images/START_selected.png");
-		startUnselected = new Image("resources/images/START_unselected.png");
-		quitSelected = new Image("resources/images/QUIT_selected.png");
-		quitUnselected = new Image("resources/images/QUIT_unselected.png");
-		backgroundScreen = new Image("resources/images/startScreen.png");
+		startSelected = new Image("resources/images/introscreen/START_selected.png");
+		startUnselected = new Image("resources/images/introscreen/START_unselected.png");
+		quitSelected = new Image("resources/images/introscreen/QUIT_selected.png");
+		quitUnselected = new Image("resources/images/introscreen/QUIT_unselected.png");
+		backgroundScreen = new Image("resources/images/introscreen/startScreen.png");
 		// Initializes intro screen sounds
 		choose = new Sound("resources/sounds/introScreen/choose.wav");
 		selected = new Sound("resources/sounds/introScreen/selected.wav");

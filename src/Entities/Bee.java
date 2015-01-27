@@ -17,8 +17,8 @@ public class Bee extends Entity{
 		setX(x);
 		setY(y);
 		try {
-			beeSheetLeft = new SpriteSheet("resources/spritesheets/bee_left_flying.png", 32, 32);
-			beeSheetRight = new SpriteSheet("resources/spritesheets/bee_right_flying.png", 32, 32);
+			beeSheetLeft = new SpriteSheet("resources/spritesheets/bee/bee_left_flying.png", 32, 32);
+			beeSheetRight = new SpriteSheet("resources/spritesheets/bee/bee_right_flying.png", 32, 32);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
