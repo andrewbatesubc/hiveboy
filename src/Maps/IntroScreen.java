@@ -20,8 +20,7 @@ public class IntroScreen extends BasicGameState{
 
 	private Image startSelected, startUnselected, quitSelected, quitUnselected, backgroundScreen;
 	private Sound selected, choose;
-	private boolean isStartSelected = true, pressedEnter = false;
-	private long counter = 0;
+	private boolean isStartSelected = true;
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -37,10 +36,9 @@ public class IntroScreen extends BasicGameState{
 		quitSelected = new Image("resources/images/QUIT_selected.png");
 		quitUnselected = new Image("resources/images/QUIT_unselected.png");
 		backgroundScreen = new Image("resources/images/startScreen.png");
-
 		// Initializes intro screen sounds
-		choose = new Sound("resources/sounds/choose.wav");
-		selected = new Sound("resources/sounds/selected.wav");
+		choose = new Sound("resources/sounds/introScreen/choose.wav");
+		selected = new Sound("resources/sounds/introScreen/selected.wav");
 
 	}
 
@@ -66,27 +64,33 @@ public class IntroScreen extends BasicGameState{
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
+		
+		//Handles key input
 		Input input = container.getInput();
-		if(pressedEnter){
-			counter += delta;
-			if(counter >= 500)
-			game.enterState(1, new FadeOutTransition(Color.black), new EmptyTransition());
-		}
 
 		if(input.isKeyPressed(Input.KEY_DOWN))
 		{
+			if(isStartSelected){
 			isStartSelected = false;
 			choose.play();
+			}
 		}
 		if(input.isKeyPressed(Input.KEY_UP))
 		{
+			if(!isStartSelected){
 			isStartSelected = true;
 			choose.play();
+			}
 		}
+		// Enters or exits game based on selection
 		if(input.isKeyPressed(Input.KEY_ENTER))
 		{
-			selected.play();
-			pressedEnter = true;
+			if(!isStartSelected)
+				container.exit();
+			else{
+				selected.play();
+				game.enterState(1, new FadeOutTransition(Color.black), new EmptyTransition());
+			}
 		}
 	}
 
