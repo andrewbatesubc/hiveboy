@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="tilesheet" tilewidth="32" tileheight="32">
-  <image source="hiveBoy/resources/tilemaps/browserquest/img/2/tilesheet.png" width="640" height="3136"/>
+  <image source="tilesheet.png" width="640" height="3136"/>
  </tileset>
  <layer name="ground" width="50" height="50">
   <data encoding="base64" compression="gzip">
