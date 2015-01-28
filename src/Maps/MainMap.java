@@ -33,7 +33,7 @@ public class MainMap extends BasicGameState{
 		hiveBoy = new HiveBoy(400, 400, this);
 		bee = new Bee(300, 300, this);
 		beeBox = new BeeBox(200, 200, this);
-		tiledMap = new TiledMap("resources/tilemaps/exp1.tmx");
+		tiledMap = new TiledMap("resources/tilemaps/testedits.tmx");
 		camera = new Camera(container, tiledMap);
 		container.setTargetFrameRate(60);
 		container.setUpdateOnlyWhenVisible(false);
@@ -79,6 +79,7 @@ public class MainMap extends BasicGameState{
 		if(input.isKeyDown(Input.KEY_LEFT)){
 			hiveBoy.setLeft(true);
 			hiveBoy.setFacing(2);
+			hiveBoy.setDigging(false); // TODO
 		}
 		else hiveBoy.setLeft(false);
 
@@ -86,6 +87,7 @@ public class MainMap extends BasicGameState{
 		if(input.isKeyDown(Input.KEY_RIGHT)){
 			hiveBoy.setRight(true);
 			hiveBoy.setFacing(3);
+			hiveBoy.setDigging(false); // TODO
 		}
 		else hiveBoy.setRight(false);
 
@@ -93,6 +95,7 @@ public class MainMap extends BasicGameState{
 		if(input.isKeyDown(Input.KEY_DOWN)){
 			hiveBoy.setDown(true);
 			hiveBoy.setFacing(1);
+			hiveBoy.setDigging(false); // TODO
 		}
 		else hiveBoy.setDown(false);
 
@@ -100,6 +103,7 @@ public class MainMap extends BasicGameState{
 		if(input.isKeyDown(Input.KEY_UP)){
 			hiveBoy.setUp(true);
 			hiveBoy.setFacing(0);
+			hiveBoy.setDigging(false); // TODO
 		}
 		else hiveBoy.setUp(false);
 

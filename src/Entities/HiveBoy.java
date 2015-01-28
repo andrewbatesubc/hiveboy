@@ -54,7 +54,7 @@ public class HiveBoy extends Entity{
 			forwardWalk = new Animation(forwardSheet, animSpeed);
 			leftWalk = new Animation(leftSheet, animSpeed);
 			rightWalk = new Animation(rightSheet, animSpeed);
-			dig = new Animation(digSheet, animSpeed);
+			dig = new Animation(digSheet, animSpeed*2);
 			currentAnimation = forwardWalk;
 
 		} catch (SlickException e) {
@@ -186,6 +186,12 @@ public class HiveBoy extends Entity{
 
 	public boolean getDig() {
 		return isDigging;
+	}
+
+
+	public void setDigging(boolean b) {
+		isDigging = b;
+		
 	}
 
 
