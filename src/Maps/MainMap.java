@@ -3,7 +3,6 @@ package Maps;
 import java.util.ArrayList;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
@@ -13,7 +12,6 @@ import Entities.Bee;
 import Entities.BeeBox;
 import Entities.HiveBoy;
 import Entities.AddedTiles.AddedTile;
-import Entities.AddedTiles.DirtTile;
 
 public class MainMap extends BasicGameState{
 
@@ -23,7 +21,6 @@ public class MainMap extends BasicGameState{
 	private TiledMap tiledMap;
 	private Camera camera;
 	private ArrayList<AddedTile> addedTiles;
-	private int timer = 0;
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
