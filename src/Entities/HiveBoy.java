@@ -3,6 +3,7 @@ package Entities;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
@@ -23,14 +24,11 @@ public class HiveBoy extends Entity{
 	private Sound step;
 	private long stepCounter = 0;
 
-
-
 	public HiveBoy(int x, int y, MainMap mainMap){
 		setX(x);
 		setY(y);
 		this.mainMap = mainMap;
 		try {
-
 			// loads all spritesheets
 			backSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_backside.png", 32, 32);
 			forwardSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_forward.png", 32, 32);
@@ -66,7 +64,9 @@ public class HiveBoy extends Entity{
 
 	public Animation getCurrentAnimation(){ return currentAnimation;}
 
-	public void tick() {
+	public void tick(Input input) {
+		hiveboyMovement(input);
+		//Updates HiveBoy's current animation based on behavior
 		if(isDigging){currentAnimation = dig;}
 		if(isRight) {dx = moveSpeed; currentAnimation = rightWalk; currentStill = rightStill;}
 		else if(isLeft) {dx = -moveSpeed; currentAnimation = leftWalk; currentStill = leftStill;}
@@ -77,11 +77,11 @@ public class HiveBoy extends Entity{
 		else dy = 0;
 
 		if(dx != 0 || dy != 0){
-
 			MovePlayer(getX() + (int)dx, getY() + (int)dy);
 		}
-
+		
 	}
+	//Checks if tile is valid, and moves if possible
 	private void MovePlayer(int dx, int dy) {
 		if(ValidMovement(dx, dy)){
 			setX(dx);
@@ -89,10 +89,8 @@ public class HiveBoy extends Entity{
 			facingTileX = dx/32;
 			facingTileY = dy/32;
 		}
-
 	}
-
-
+	//Determines if next tile to move is valid (not collidable)
 	private boolean ValidMovement(int dx, int dy) {
 		int tileX = dx/32 + 1;
 		int tileY = dy/32 + 2;
@@ -115,90 +113,107 @@ public class HiveBoy extends Entity{
 	public boolean isLeft() {
 		return isLeft;
 	}
-
 	public void setLeft(boolean isLeft) {
 		this.isLeft = isLeft;
 	}
-
 	public boolean isDown() {
 		return isDown;
 	}
-
 	public void setDown(boolean isDown) {
 		this.isDown = isDown;
 	}
-
 	public boolean isRight() {
 		return isRight;
-
 	}
-
 	public void setRight(boolean isRight) {
 		this.isRight = isRight;
 	}
-
 	public float getDy() {
 		return dy;
 	}
-
 	public void setDy(float dy) {
 		this.dy = dy;
 	}
-
 	public float getDx() {
 		return dx;
 	}
-
 	public void setDx(float dx) {
-
 		this.dx = dx;
 	}
-
 	public Image getCurrentStill() {
 		return currentStill;
 	}
-
-
 	public void pressedSpace() {
+		//Digs dirt at current tile TODO: Validate dig location
 		DirtTile tile = null;
 		isDigging = true;
-		// Digs dirt based on direction facing TODO: Implement proper location checking
-		switch(lastFacing){
-		case 0: tile = new DirtTile(facingTileX*32 + 32, facingTileY*32 - 32, mainMap); break;
-		case 1: tile = new DirtTile(facingTileX*32 + 32, facingTileY*32 + 64, mainMap); break;
-		case 2: tile = new DirtTile(facingTileX*32, facingTileY*32 + 64, mainMap); 		break;
-		case 3: tile = new DirtTile(facingTileX*32 + 64, facingTileY*32 + 64, mainMap); break;
-		default: break;
-		}
-
+		tile = new DirtTile(facingTileX*32 + 32, facingTileY*32 + 64, mainMap);
 		if(tile != null && !mainMap.getAddedTiles().contains(tile))
 			mainMap.getAddedTiles().add(tile);
-		
 	}
-
-
-
-
 	public void setFacing(int i) {
 		lastFacing = i;
 	}
-
-
 	public boolean getDig() {
 		return isDigging;
 	}
-
-
 	public void setDigging(boolean b) {
 		isDigging = b;
-		
 	}
+	public void hiveboyMovement(Input input) {
+			// Key left
+			if(input.isKeyDown(Input.KEY_LEFT)){
+				isLeft = true;
+				lastFacing = 2;
+				isDigging = false; // TODO
+			}
+			else isLeft = false;
+
+			// Key right 
+			if(input.isKeyDown(Input.KEY_RIGHT)){
+				isRight = true;
+				lastFacing = 3;
+				isDigging = false; // TODO
+			}
+			else isRight = false;
+
+			// Key down 
+			if(input.isKeyDown(Input.KEY_DOWN)){
+				isDown = true;
+				lastFacing = 1;
+				isDigging = false; // TODO
+			}
+			else isDown = false;
+
+			// Key up 
+			if(input.isKeyDown(Input.KEY_UP)){
+				isUp = true;
+				lastFacing = 0;
+				isDigging = false; // TODO
+			}
+			else isUp = false;
+
+			// Key space
+			if(input.isKeyPressed(Input.KEY_SPACE)){
+				pressedSpace();
+			}
+		}
+		
+	
 
 
-
-
-
-
-
+public void drawHiveBoy() {
+	//Draws HiveBoy's still picture if he isn't moving
+	if(dx == 0 && dy == 0 && !isDigging)
+		currentStill.draw(getX(), getY(), scale);
+	//Otherwise draws HiveBoy's animation based on his activity
+	else 	currentAnimation.draw(getX(), getY(), 
+			currentAnimation.getWidth()*scale, 
+			currentAnimation.getHeight()*scale);
+}
 
 }
+
+
+
+
