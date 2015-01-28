@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tilesheet" tilewidth="32" tileheight="32">
+  <image source="hiveBoy/resources/tilemaps/browserquest/img/2/tilesheet.png" width="640" height="3136"/>
+ </tileset>
+ <layer name="ground" width="50" height="50">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+3PoQ0AIBAEwe+/BXrgW8QgUASCAJIRY07tZUQkAAAAx0pXJ243rvq5fefbuN3ugteUBxoAAAAAAHY1lulumhAnAAA=
+  </data>
+ </layer>
+ <layer name="ground2" width="50" height="50">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAODfAC7KO00QJwAA
+  </data>
+ </layer>
+ <layer name="ground3" width="50" height="50">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+3BAQ0AAADCoPdPbQ43oAAAAAAAAAAAAODfAC7KO00QJwAA
+  </data>
+ </layer>
+ <layer name="collision" width="50" height="50">
+  <properties>
+   <property name="collidable" value=""/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+2YSU8UQRiGu2dMEBASFYSDbCYqR/Y7ixt3Fg148OYa8A78DOBPoReQRA8M4EEh0YOsCcvTyRg7Q3VtVHfTpt/kycykur96v8pXy5Tn5cqVK1euXLmyrkU/OyzBckRbWKuwBl9gPYUxjZKprx/wE3Zg1zKGKy8qXzKdwCmcBT98uxi2XmR5inyJ5NNWgJtwC25Dg28WQyVVHFmeIl8iNdJ2B+7DA3gInb5ZjLD2Cp63DwcFfS+yPEW+TCWK8RW+Sd6pLnpeDdQW9b3ojpfLtegX/Ja0t+C/FdqKkocqpDvmqnn2StHPCnyCzxqeuvHfA70GeejqMvO1BJuwBdvw3a01I8nqb7DK84ZguOrie39gD/bhAA7hCI7L7RvM5RJswpbm9+3CxX50Jau/MfyPw4Qgj+s8Ww01UAs3oA7q/X95mPgyfd5Er/H/Bt4K8riL3xZohTZohw64dwXzmMP/PCwI8ujCbzf0QC/0QT8MpJSH7bo7gt9H8BiewFN4BqMJ5VGkn2uheWB7TpokxnN4UY41xec0vEwojyb6aQ7lYbvuvuPZ9/Ch/M4Mn7PwMZRHSbIeqdrD0qkZm3NS0tKpGRdnrbjl6mydtrJQMzrKQs240FW9PzCVq//YaSuL60DlPh5Itg4kXXO6/VXu44Fk60DSNRdXf0nXXFz9Jb33mPanW4eqvcf1/DHd65K6z4xbpnUYNe5pr9mmdRg17mmf3UzrMGrcs3Z2c32/KrqrtokTSLS3R8nV/epfie6qbeIEEu3tl5XuvFfdVWdl/VDdVWdt/Yg7zv+mc2A3I/MQJwAA
+  </data>
+ </layer>
+ <layer name="events" width="50" height="50">
+  <properties>
+   <property name="event" value=""/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+3PQQ0AMAgAMaYTEfj/YWIJbGkV3EUAAAAAAJvkmS64oz75AAAAAOAdDQ4tQPUQJwAA
+  </data>
+ </layer>
+</map>
