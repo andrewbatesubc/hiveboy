@@ -50,15 +50,13 @@ public class IntroScreen extends BasicGameState{
 
 		// Draws menu buttons based on selection
 		if(isStartSelected){// Highlights Start
-			startSelected.drawCentered(400,300);
+		 	startSelected.drawCentered(400,300);
 			quitUnselected.drawCentered(400, 425);
 		}
 		else{				// Highlights Quit
 			startUnselected.drawCentered(400,300);
 			quitSelected.drawCentered(400, 425);
 		}
-
-
 	}
 
 	@Override

@@ -5,10 +5,13 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
+import Entities.HiveBoy;
+import Maps.House;
 import Maps.IntroScreen;
 import Maps.MainMap;
 
 public class Start extends StateBasedGame{
+	HiveBoy mainBoy;
 
 	public Start(String title){
 		super(title);
@@ -16,8 +19,11 @@ public class Start extends StateBasedGame{
 	
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
-		addState(new IntroScreen());
-		addState(new MainMap());
+		mainBoy = new HiveBoy(400, 400, null);
+		//addState(new IntroScreen());
+		
+		addState(new House(mainBoy));
+		addState(new MainMap(mainBoy));
 	}
 	
 	public static void main(String[] args) throws SlickException {

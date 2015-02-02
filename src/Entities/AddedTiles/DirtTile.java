@@ -2,18 +2,20 @@ package Entities.AddedTiles;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.state.BasicGameState;
 
 import Maps.MainMap;
+import Maps.MapInterface;
 
 public class DirtTile extends AddedTile{
 	private Image image;
-	private MainMap mainMap;
+	private MapInterface currentMap;
 	private int x, y;
 	
-	public DirtTile(int x, int y, MainMap mainMap){
+	public DirtTile(int x, int y, MapInterface currentMap){
 		this.x = x;
 		this.y = y;
-		this.mainMap = mainMap;
+		this.currentMap = currentMap;
 		try {
 			image = new Image("resources/tilemaps/testTiles/dirt.png");
 		} catch (SlickException e) {

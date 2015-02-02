@@ -13,7 +13,7 @@ import Entities.BeeBox;
 import Entities.HiveBoy;
 import Entities.AddedTiles.AddedTile;
 
-public class MainMap extends BasicGameState{
+public class MainMap extends BasicGameState implements MapInterface{
 
 	private HiveBoy hiveBoy;
 	private Bee bee;
@@ -21,18 +21,25 @@ public class MainMap extends BasicGameState{
 	private TiledMap tiledMap;
 	private Camera camera;
 	private ArrayList<AddedTile> addedTiles;
+	StateBasedGame game;
+
+	public MainMap(HiveBoy mainBoy) {
+		super();
+		hiveBoy = mainBoy;
+	}
+
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
-		hiveBoy = new HiveBoy(400, 400, this);
+		this.game = game;
+		hiveBoy.setCurrentMap(this);
 		bee = new Bee(300, 300, this);
 		beeBox = new BeeBox(200, 200, this);
 		tiledMap = new TiledMap("resources/tilemaps/testedits.tmx");
 		camera = new Camera(container, tiledMap);
 		container.setTargetFrameRate(60);
 		container.setUpdateOnlyWhenVisible(false);
-		tiledMap.getLayerIndex("collision");
 		addedTiles = new ArrayList<AddedTile>();
 	}
 
@@ -62,6 +69,8 @@ public class MainMap extends BasicGameState{
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
+		// Confirms hiveboy's state
+		hiveBoy.setCurrentMap(this);
 		
 		// Ticks hiveboy Animation
 		hiveBoy.getCurrentAnimation().update(delta);
@@ -74,9 +83,9 @@ public class MainMap extends BasicGameState{
 		
 		//Centers camera on HiveBoy
 		camera.centerOn(hiveBoy.getX(), hiveBoy.getY());
-	}
-
+		
 	
+	}
 
 	public TiledMap getTiledMap(){return tiledMap;}
 	public ArrayList getAddedTiles(){return addedTiles;}
@@ -84,6 +93,13 @@ public class MainMap extends BasicGameState{
 	public int getID() {
 		// TODO Auto-generated method stub
 		return 1;
+	}
+
+
+	@Override
+	public StateBasedGame returnGame() {
+		
+		return game;
 	}
 
 
