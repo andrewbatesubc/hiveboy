@@ -1,11 +1,14 @@
 package Maps;
 
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import org.newdawn.slick.state.transition.EmptyTransition;
+import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.tiled.TiledMap;
 
 import Entities.HiveBoy;
@@ -15,12 +18,13 @@ public class House extends BasicGameState implements MapInterface{
 	private TiledMap tiledMap;
 	private Camera camera;
 	private StateBasedGame game;
-	
+
 	public House(HiveBoy mainBoy) {
 		// TODO Auto-generated constructor stub
 		super();
 		hiveBoy = mainBoy;
 	}
+	
 
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
@@ -31,7 +35,15 @@ public class House extends BasicGameState implements MapInterface{
 		camera = new Camera(container, tiledMap);
 		container.setTargetFrameRate(60);
 		container.setUpdateOnlyWhenVisible(false);
-		
+
+	}
+	
+	@Override
+	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
+		super.enter(container, game);
+		hiveBoy.setCurrentMap(this);
+		hiveBoy.setX(365);
+		hiveBoy.setY(475);
 	}
 
 	@Override
@@ -39,13 +51,13 @@ public class House extends BasicGameState implements MapInterface{
 			throws SlickException {
 		//Draws current map
 		camera.drawMap();
-		
+
 		//Centers view area over HiveBoy
 		camera.translateGraphics();
-		
+
 		//Draws HiveBoy
 		hiveBoy.drawHiveBoy();
-		
+
 	}
 
 	@Override
@@ -53,15 +65,24 @@ public class House extends BasicGameState implements MapInterface{
 			throws SlickException {
 		//Ticks current hiveBoy animation
 		hiveBoy.getCurrentAnimation().update(delta);
-		
+
 		//Receives current keyboard input
 		Input input = container.getInput();
-		
+
 		//Ticks HiveBoy
-		hiveBoy.tick(input);
+		hiveBoy.tickAnimation();
+
+		//Ticks hiveboy's actual movement
+		hiveBoy.tickHiveboyMovement(input);
 		
+		if(checkDoor()){
+			input.pause();
+			game.enterState(1, new FadeOutTransition(Color.black), new EmptyTransition());		
+			input.resume();
+		}
+
 		camera.centerOn(hiveBoy.getX(), hiveBoy.getY());
-		
+
 	}
 
 	@Override
@@ -75,6 +96,14 @@ public class House extends BasicGameState implements MapInterface{
 	public StateBasedGame returnGame() {
 		// TODO Auto-generated method stub
 		return game;
+	}
+	
+	private boolean checkDoor() {
+		int exitHouseCheckIndex = tiledMap.getLayerIndex("exitHouse");
+		int enterID = tiledMap.getTileId(hiveBoy.getTileX(), hiveBoy.getTileY(), exitHouseCheckIndex);
+		if(enterID !=0)
+			return true;
+		else return false;
 	}
 
 }
