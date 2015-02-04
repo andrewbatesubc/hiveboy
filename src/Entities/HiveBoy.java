@@ -1,19 +1,10 @@
 package Entities;
 
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
-import org.newdawn.slick.state.BasicGameState;
-import org.newdawn.slick.state.transition.EmptyTransition;
-import org.newdawn.slick.state.transition.FadeOutTransition;
-
-import Entities.AddedTiles.DirtTile;
-import Maps.MainMap;
 import Maps.MapInterface;
 
 public class HiveBoy extends Entity{
@@ -21,12 +12,11 @@ public class HiveBoy extends Entity{
 	private MapInterface currentMap;
 	private boolean isLeft = false, isRight = false, isDown = false, isUp = false, isDigging = false;
 	private float dx = 0, dy = 0, moveSpeed = 2, scale = 2;
-	private int animSpeed = 200, lastFacing = 0, facingTileX = 0, facingTileY = 0, tileX, tileY;
+	private int animSpeed = 200, lastFacing = 0,tileX, tileY;
 	private SpriteSheet backSheet, forwardSheet, leftSheet, rightSheet, digSheet;
 	private Image backStill, forwardStill, leftStill, rightStill, currentStill;
 	private Animation backWalk, forwardWalk, leftWalk, rightWalk, currentAnimation, dig;
-	private Sound step;
-	private long stepCounter = 0;
+	// private Sound step; // TODO: Add to sound refactor
 
 	public HiveBoy(int x, int y, MapInterface currentMap){
 		setX(x);
@@ -65,9 +55,6 @@ public class HiveBoy extends Entity{
 		}
 	}
 
-
-	public Animation getCurrentAnimation(){ return currentAnimation;}
-
 	public void tickAnimation() {
 
 		//Updates HiveBoy's current animation based on behavior
@@ -91,8 +78,6 @@ public class HiveBoy extends Entity{
 		if(ValidMovement(dx, dy)){
 			setX(dx);
 			setY(dy);
-			facingTileX = dx/32;
-			facingTileY = dy/32;
 		}
 	}
 
@@ -107,7 +92,52 @@ public class HiveBoy extends Entity{
 		else return false;
 
 	}
+	
+	public void drawHiveBoy() {
+		//Draws HiveBoy's still picture if he isn't moving
+		if(dx == 0 && dy == 0 && !isDigging)
+			currentStill.draw(getX(), getY(), scale);
+		//Otherwise draws HiveBoy's animation based on his activity
+		else 	currentAnimation.draw(getX(), getY(), 
+				currentAnimation.getWidth()*scale, 
+				currentAnimation.getHeight()*scale);
+	}
+	
+	// Handles hiveboy's movement based on key press. Movement disrupts digging
+	public void tickHiveboyMovement(Input input) {
+		// Key left
+		if(input.isKeyDown(Input.KEY_LEFT)){
+			isLeft = true;
+			lastFacing = 2;
+			isDigging = false;
+		}
+		else isLeft = false;
 
+		// Key right 
+		if(input.isKeyDown(Input.KEY_RIGHT)){
+			isRight = true;
+			lastFacing = 3;
+			isDigging = false;
+		}
+		else isRight = false;
+
+		// Key down 
+		if(input.isKeyDown(Input.KEY_DOWN)){
+			isDown = true;
+			lastFacing = 1;
+			isDigging = false;
+		}
+		else isDown = false;
+
+		// Key up 
+		if(input.isKeyDown(Input.KEY_UP)){
+			isUp = true;
+			lastFacing = 0;
+			isDigging = false; // TODO: create better way of disabling dig animation
+		}
+		else isUp = false;
+	}
+	public Animation getCurrentAnimation(){ return currentAnimation;}
 	public int getTileX(){
 		return tileX;
 	}
@@ -115,15 +145,12 @@ public class HiveBoy extends Entity{
 		return tileY;
 	}
 	public float getScale(){return scale;}
-
 	public boolean isUp() {
 		return isUp;
 	}
-
 	public void setUp(boolean isUp) {
 		this.isUp = isUp;
 	}
-
 	public boolean isLeft() {
 		return isLeft;
 	}
@@ -157,7 +184,6 @@ public class HiveBoy extends Entity{
 	public Image getCurrentStill() {
 		return currentStill;
 	}
-
 	public void setFacing(int i) {
 		lastFacing = i;
 	}
@@ -167,63 +193,11 @@ public class HiveBoy extends Entity{
 	public void setDigging(boolean b) {
 		isDigging = b;
 	}
-
-	public void tickHiveboyMovement(Input input) {
-		// Key left
-		if(input.isKeyDown(Input.KEY_LEFT)){
-			isLeft = true;
-			lastFacing = 2;
-			isDigging = false;
-		}
-		else isLeft = false;
-
-		// Key right 
-		if(input.isKeyDown(Input.KEY_RIGHT)){
-			isRight = true;
-			lastFacing = 3;
-			isDigging = false;
-		}
-		else isRight = false;
-
-		// Key down 
-		if(input.isKeyDown(Input.KEY_DOWN)){
-			isDown = true;
-			lastFacing = 1;
-			isDigging = false;
-		}
-		else isDown = false;
-
-		// Key up 
-		if(input.isKeyDown(Input.KEY_UP)){
-			isUp = true;
-			lastFacing = 0;
-			isDigging = false; // TODO: create better way of disabling dig animation
-		}
-		else isUp = false;
-
-		
-	}
-
 	public int getFacing(){
 		return lastFacing;
 	}
-
-	public void drawHiveBoy() {
-		//Draws HiveBoy's still picture if he isn't moving
-		if(dx == 0 && dy == 0 && !isDigging)
-			currentStill.draw(getX(), getY(), scale);
-		//Otherwise draws HiveBoy's animation based on his activity
-		else 	currentAnimation.draw(getX(), getY(), 
-				currentAnimation.getWidth()*scale, 
-				currentAnimation.getHeight()*scale);
-	}
-
 	public void setCurrentMap(MapInterface map){
 		currentMap = map;
 	}
-
 }
-
-
-
 

@@ -30,12 +30,13 @@ public class MainMap extends BasicGameState implements MapInterface{
 	StateBasedGame game;
 	Input input;
 
+	// Passes hiveboy reference to constructor, kept as global variable
 	public MainMap(HiveBoy mainBoy) {
 		super();
 		hiveBoy = mainBoy;
 	}
 
-
+	// Initializes all entities, adds tilemap, sets up Camera class to focus on hiveboy
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
@@ -49,63 +50,66 @@ public class MainMap extends BasicGameState implements MapInterface{
 		container.setUpdateOnlyWhenVisible(false);
 		addedTiles = new ArrayList<AddedTile>();
 		input = container.getInput();
+
 		
 	}
-
+	// Renders all render-able objects
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
-		//Draws the map
+		// Draws the map
 		camera.drawMap();
 
-		//Renders the current area HiveBoy is occupying
+		// Renders the current area HiveBoy is occupying
 		camera.translateGraphics();
 
-		//Draws all added dirt tiles
+		// Draws all added dirt tiles
 		for(AddedTile tile : addedTiles){
 			tile.getImage().draw(tile.getX(), tile.getY());
 		}
 
-		//Draws HiveBoy
+		// Draws HiveBoy
 		hiveBoy.drawHiveBoy();
 
-		//Draws a bee
+		// Draws a bee
 		bee.getCurrentAnimation().draw(bee.getX(), bee.getY());
 
-		//Draw's a bee-box
+		// Draw's a bee-box
 		beeBox.getImage().draw(beeBox.getX(), beeBox.getY(), 2);
 	}
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 		
-		//Digs!
-		if(input.isKeyPressed(Input.KEY_SPACE))
+		// Digs when on dirt patch in garden
+		if(input.isKeyPressed(Input.KEY_SPACE)){
 			pressedSpace();
+		}
 		
+
+		// Updates hiveboy's current animation
+		hiveBoy.tickAnimation();
 		
 		// Ticks hiveboy Animation
 		hiveBoy.getCurrentAnimation().update(delta);
-	
 
-		//Updates hiveboy's current animation
-		hiveBoy.tickAnimation();
 
-		//Ticks hiveboy's actual movement
+		// Ticks hiveboy's actual movement
 		hiveBoy.tickHiveboyMovement(input);
 
-		//Handles door entry event
+		// Handles door entry event
 		if(checkDoor()){
 			input.pause();
 			game.enterState(2, new FadeOutTransition(Color.black), new EmptyTransition());		
 			input.resume();
 		}
 
-		//Centers camera on HiveBoy
+		// Centers camera on HiveBoy
 		camera.centerOn(hiveBoy.getX(), hiveBoy.getY());
 
 	}
 
+	// Handles entry to this map. Puts hiveboy in front of his door, updates current map
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
 		super.enter(container, game);
@@ -114,6 +118,7 @@ public class MainMap extends BasicGameState implements MapInterface{
 		hiveBoy.setY(850);
 	}
 
+	// Checks to see if hiveboy has collided with door, if so, transitions to house map
 	private boolean checkDoor() {
 		int enterHouseCheckIndex = tiledMap.getLayerIndex("enterHouse");
 		int enterID = tiledMap.getTileId(hiveBoy.getTileX(), hiveBoy.getTileY(), enterHouseCheckIndex);
@@ -122,26 +127,22 @@ public class MainMap extends BasicGameState implements MapInterface{
 		else return false;
 	}
 
-
-
-
 	public TiledMap getTiledMap(){return tiledMap;}
 	public ArrayList getAddedTiles(){return addedTiles;}
+	
+	// Indicates which map you are currently on by unique map ID
 	@Override
 	public int getID() {
 		// TODO Auto-generated method stub
 		return 1;
 	}
 
-
 	@Override
 	public StateBasedGame returnGame() {
-
 		return game;
 	}
 
-
-
+	// Verifies that hiveboy is indeed on diggable dirt, then digs and updates animation
 	public void pressedSpace() {
 		int checkDirt = tiledMap.getLayerIndex("diggable");
 		int enterID = tiledMap.getTileId(hiveBoy.getTileX(), hiveBoy.getTileY(), checkDirt);
