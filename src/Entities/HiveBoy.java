@@ -1,10 +1,13 @@
 package Entities;
 
+import java.util.ArrayList;
+
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Rectangle;
 
 import Maps.MapInterface;
 import Utilities.Inventory;
@@ -19,6 +22,7 @@ public class HiveBoy extends Entity{
 	private Image backStill, forwardStill, leftStill, rightStill;
 	private Animation backWalk, forwardWalk, leftWalk, rightWalk, currentAnimation, dig;
 	private Inventory inventory;
+	private ArrayList<Entity> collidable;
 	// private Sound step; // TODO: Add to sound refactor
 
 	public HiveBoy(int x, int y, MapInterface currentMap){
@@ -42,7 +46,8 @@ public class HiveBoy extends Entity{
 			leftStill.setFilter(Image.FILTER_NEAREST);
 			rightStill = new Image("resources/images/hiveboy/hiveboy_sideways_right_still.png");
 			rightStill.setFilter(Image.FILTER_NEAREST);
-			//currentStill = forwardStill;
+			
+			//Sets initial image, and sets up collision rectangle
 			setImage(rightStill, 2);
 			setBounds();
 
@@ -89,6 +94,19 @@ public class HiveBoy extends Entity{
 
 	//Determines if next tile to move is valid (not collidable)
 	private boolean ValidMovement(int dx, int dy) {
+
+		// Creates a rectangle at the to move location to check for collisions
+		Rectangle toCheck = new Rectangle(dx, dy, 
+				getRectangle().getWidth(), getRectangle().getHeight());
+		
+		//Iterates through collidable objects and sees if rectangle would produce collision
+		//if so, does not move there
+		for(Entity e : collidable){
+			if(e.getRectangle().intersects(toCheck))
+			return false;
+		}
+		
+		//Handles collision with tilemap layers 
 		int tileWidth = getMap().getTiledMap().getTileWidth();
 		tileX = dx/tileWidth + 1;
 		tileY = dy/tileWidth + 2;
@@ -109,7 +127,7 @@ public class HiveBoy extends Entity{
 				currentAnimation.getHeight()*scale);
 	}
 	
-	// Handles hiveboy's movement based on key press. Movement disrupts digging
+	// Handles HiveBoy's movement based on key press. Movement disrupts digging
 	public void tickKeyHandler(Input input) {
 		
 		if(input.isKeyPressed(Input.KEY_TAB))
@@ -221,6 +239,9 @@ public class HiveBoy extends Entity{
 	
 	public Inventory getInventory(){
 		return inventory;
+	}
+	public void setCollidable(ArrayList<Entity> list){
+		collidable = list;
 	}
 }
 

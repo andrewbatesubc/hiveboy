@@ -3,7 +3,6 @@ package Entities;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 
-import Maps.MainMap;
 import Maps.MapInterface;
 
 public abstract class Entity {
@@ -53,6 +52,10 @@ public abstract class Entity {
 	
 	public void setMap(MapInterface map){
 		currentMap = map;
+	}
+	
+	public float getScale(){
+		return imageScale;
 	}
 
 }

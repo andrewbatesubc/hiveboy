@@ -6,12 +6,15 @@ import org.newdawn.slick.SlickException;
 import Maps.MainMap;
 
 public class Seed extends Entity{
-	Image seedImage;
+
 
 	public Seed(int x, int y, MainMap mainMap) {
 		super(x, y, mainMap);
 		try {
-			seedImage = new Image("resources/images/mainMap/seeds.png");
+			setImage(new Image("resources/images/mainMap/seeds.png"), 1);
+			getImage().setFilter(Image.FILTER_NEAREST);
+			setBounds();
+			
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
