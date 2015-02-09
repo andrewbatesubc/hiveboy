@@ -8,14 +8,13 @@ import Maps.MainMap;
 
 public class Bee extends Entity{
 	
-	private MainMap mainMap;
 	private int animSpeed = 70;
 	private SpriteSheet beeSheetLeft, beeSheetRight;
 	private Animation beeBuzzLeft, beeBuzzRight, currentAnimation;
+	
 	public Bee(int x, int y, MainMap mainMap){
-		this.mainMap = mainMap;
-		setX(x);
-		setY(y);
+		super(x, y, mainMap);
+
 		try {
 			beeSheetLeft = new SpriteSheet("resources/spritesheets/bee/bee_left_flying.png", 32, 32);
 			beeSheetRight = new SpriteSheet("resources/spritesheets/bee/bee_right_flying.png", 32, 32);

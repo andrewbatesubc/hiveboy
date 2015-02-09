@@ -1,11 +1,17 @@
 package Maps;
 
 import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.tiled.TiledMap;
 
-public class Camera {
+import Entities.HiveBoy;
+import Utilities.Inventory;
 
+public class Camera {
+	// to be removed
+	private HiveBoy hiveBoy;
    /** the map used for our scene */
    protected TiledMap map;
    
@@ -42,7 +48,8 @@ public class Camera {
     * @param gc the GameContainer, used for getting the size of the GameCanvas
     * @param map the TiledMap used for the current scene
     */
-   public Camera(GameContainer gc, TiledMap map) {
+   public Camera(GameContainer gc, TiledMap map, HiveBoy hiveBoy) {
+	   this.hiveBoy = hiveBoy;
       this.map = map;
       
       this.numTilesX = map.getWidth();
@@ -108,7 +115,7 @@ public class Camera {
 	      this.drawMapWithLayer(0, 0, layer);
 	   }
    
-   /**
+   /**	
     * draws the part of the map which is currently focussed by the camera on the screen.<br>
     * You need to draw something over the offset, to prevent the edge of the map to be displayed below it<br>
     * Has to be called before Camera.translateGraphics() !
@@ -134,7 +141,10 @@ public class Camera {
              tileIndexY,
                 (gc.getWidth()  - tileOffsetX) / tileWidth  + 1,
                 (gc.getHeight() - tileOffsetY) / tileHeight + 1);
+       hiveBoy.getInventory().drawInventory(gc.getWidth() /2, gc.getHeight() - 50);    
+       
    }
+   
    public void drawMapWithLayer(int offsetX, int offsetY, int layer) {
        //calculate the offset to the next tile (needed by TiledMap.render())
        int tileOffsetX = (int) - (cameraX % tileWidth);

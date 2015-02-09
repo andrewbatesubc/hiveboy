@@ -13,9 +13,11 @@ import org.newdawn.slick.state.transition.EmptyTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.tiled.TiledMap;
 
+import Utilities.Inventory;
 import Entities.Bee;
 import Entities.BeeBox;
 import Entities.HiveBoy;
+import Entities.Seed;
 import Entities.AddedTiles.AddedTile;
 import Entities.AddedTiles.DirtTile;
 
@@ -27,8 +29,11 @@ public class MainMap extends BasicGameState implements MapInterface{
 	private TiledMap tiledMap;
 	private Camera camera;
 	private ArrayList<AddedTile> addedTiles;
-	StateBasedGame game;
-	Input input;
+	private StateBasedGame game;
+	private Input input;
+	private Inventory inventory;
+	private Seed seed;
+	
 
 	// Passes hiveboy reference to constructor, kept as global variable
 	public MainMap(HiveBoy mainBoy) {
@@ -40,12 +45,14 @@ public class MainMap extends BasicGameState implements MapInterface{
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
+		inventory = new Inventory();
 		this.game = game;
-		hiveBoy.setCurrentMap(this);
+		hiveBoy.setMap(this);
+		seed = new Seed(79, 915, this);
 		bee = new Bee(76, 912, this);
 		beeBox = new BeeBox(72,924, this);
 		tiledMap = new TiledMap("resources/tilemaps/testedits.tmx");
-		camera = new Camera(container, tiledMap);
+		camera = new Camera(container, tiledMap, hiveBoy);
 		container.setTargetFrameRate(60);
 		container.setUpdateOnlyWhenVisible(false);
 		addedTiles = new ArrayList<AddedTile>();
@@ -57,6 +64,10 @@ public class MainMap extends BasicGameState implements MapInterface{
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
+		
+		//TODO: populate arrayList of images that are currently on map, only render those
+		// Pass those as parameter to camera class and render them
+		
 		// Draws the map
 		camera.drawMap();
 
@@ -70,10 +81,12 @@ public class MainMap extends BasicGameState implements MapInterface{
 
 		// Draws HiveBoy
 		hiveBoy.drawHiveBoy();
-
+		
 		// Draws a bee
 		bee.getCurrentAnimation().draw(bee.getX(), bee.getY());
-
+		
+		g.draw(beeBox.getRectangle());
+		g.draw(hiveBoy.getRectangle());
 		// Draw's a bee-box
 		beeBox.getImage().draw(beeBox.getX(), beeBox.getY(), 2);
 	}
@@ -81,11 +94,11 @@ public class MainMap extends BasicGameState implements MapInterface{
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 		
+		
 		// Digs when on dirt patch in garden
 		if(input.isKeyPressed(Input.KEY_SPACE)){
 			pressedSpace();
 		}
-		
 
 		// Updates hiveboy's current animation
 		hiveBoy.tickAnimation();
@@ -95,7 +108,7 @@ public class MainMap extends BasicGameState implements MapInterface{
 
 
 		// Ticks hiveboy's actual movement
-		hiveBoy.tickHiveboyMovement(input);
+		hiveBoy.tickKeyHandler(input);
 
 		// Handles door entry event
 		if(checkDoor()){
@@ -113,7 +126,7 @@ public class MainMap extends BasicGameState implements MapInterface{
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
 		super.enter(container, game);
-		hiveBoy.setCurrentMap(this);
+		hiveBoy.setMap(this);
 		hiveBoy.setX(340);
 		hiveBoy.setY(850);
 	}

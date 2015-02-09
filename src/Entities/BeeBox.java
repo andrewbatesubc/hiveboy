@@ -7,23 +7,19 @@ import Maps.MainMap;
 
 public class BeeBox extends Entity{
 	
-	private MainMap mainMap;
-	private Image hiveImage;
 	
 	public BeeBox(int x, int y, MainMap mainMap){
-		setX(x);
-		setY(y);
-		this.mainMap = mainMap;
+		super(x, y, mainMap);
+		
 		try {
-			hiveImage = new Image("resources/images/hive/hive.png");
-			hiveImage.setFilter(Image.FILTER_NEAREST);
+			setImage(new Image("resources/images/hive/hive.png"), 2);
+			getImage().setFilter(Image.FILTER_NEAREST);
+			setBounds();
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	
-	public Image getImage(){
-		return hiveImage;
-	}
 }

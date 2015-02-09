@@ -30,9 +30,9 @@ public class House extends BasicGameState implements MapInterface{
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
 		this.game = game;
-		hiveBoy.setCurrentMap(this);
+		hiveBoy.setMap(this);
 		tiledMap = new TiledMap("resources/tilemaps/house.tmx");
-		camera = new Camera(container, tiledMap);
+		camera = new Camera(container, tiledMap, hiveBoy);
 		container.setTargetFrameRate(60);
 		container.setUpdateOnlyWhenVisible(false);
 
@@ -41,7 +41,7 @@ public class House extends BasicGameState implements MapInterface{
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
 		super.enter(container, game);
-		hiveBoy.setCurrentMap(this);
+		hiveBoy.setMap(this);
 		hiveBoy.setX(365);
 		hiveBoy.setY(475);
 	}
@@ -73,7 +73,7 @@ public class House extends BasicGameState implements MapInterface{
 		hiveBoy.tickAnimation();
 
 		//Ticks hiveboy's actual movement
-		hiveBoy.tickHiveboyMovement(input);
+		hiveBoy.tickKeyHandler(input);
 		
 		if(checkDoor()){
 			input.pause();

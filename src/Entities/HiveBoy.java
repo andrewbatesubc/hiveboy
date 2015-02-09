@@ -5,23 +5,26 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
+
 import Maps.MapInterface;
+import Utilities.Inventory;
 
 public class HiveBoy extends Entity{
 
-	private MapInterface currentMap;
-	private boolean isLeft = false, isRight = false, isDown = false, isUp = false, isDigging = false;
+
+	private boolean isLeft = false, isRight = false, isDown = false, isUp = false, isDigging = false, inventorySelected = false;
 	private float dx = 0, dy = 0, moveSpeed = 2, scale = 2;
 	private int animSpeed = 200, lastFacing = 0,tileX, tileY;
 	private SpriteSheet backSheet, forwardSheet, leftSheet, rightSheet, digSheet;
-	private Image backStill, forwardStill, leftStill, rightStill, currentStill;
+	private Image backStill, forwardStill, leftStill, rightStill;
 	private Animation backWalk, forwardWalk, leftWalk, rightWalk, currentAnimation, dig;
+	private Inventory inventory;
 	// private Sound step; // TODO: Add to sound refactor
 
 	public HiveBoy(int x, int y, MapInterface currentMap){
-		setX(x);
-		setY(y);
-		this.currentMap = currentMap;
+		super(x, y, currentMap);
+		inventory = new Inventory();
+	
 		try {
 			// loads all spritesheets
 			backSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_backside.png", 32, 32);
@@ -39,7 +42,9 @@ public class HiveBoy extends Entity{
 			leftStill.setFilter(Image.FILTER_NEAREST);
 			rightStill = new Image("resources/images/hiveboy/hiveboy_sideways_right_still.png");
 			rightStill.setFilter(Image.FILTER_NEAREST);
-			currentStill = forwardStill;
+			//currentStill = forwardStill;
+			setImage(rightStill, 2);
+			setBounds();
 
 			// loads all animations
 			backWalk = new Animation(backSheet, animSpeed);
@@ -56,21 +61,22 @@ public class HiveBoy extends Entity{
 	}
 
 	public void tickAnimation() {
-
+		updateBounds();
+		if(!inventorySelected){
 		//Updates HiveBoy's current animation based on behavior
 		if(isDigging){currentAnimation = dig; dx = 0;}
-		if(isRight) {dx = moveSpeed; currentAnimation = rightWalk; currentStill = rightStill;}
-		else if(isLeft) {dx = -moveSpeed; currentAnimation = leftWalk; currentStill = leftStill;}
+		if(isRight) {dx = moveSpeed; currentAnimation = rightWalk; setImage(rightStill, scale);}
+		else if(isLeft) {dx = -moveSpeed; currentAnimation = leftWalk; setImage(leftStill, scale);}
 		else dx = 0; 
 
-		if(isUp) {dy = -moveSpeed; currentAnimation = backWalk; currentStill = backStill;}
-		else if(isDown) {dy = moveSpeed; currentAnimation = forwardWalk; currentStill = forwardStill;}
+		if(isUp) {dy = -moveSpeed; currentAnimation = backWalk; setImage(backStill, scale);}
+		else if(isDown) {dy = moveSpeed; currentAnimation = forwardWalk; setImage(forwardStill, 2);}
 		else dy = 0;
 
 		if(dx != 0 || dy != 0){
 			MovePlayer(getX() + (int)dx, getY() + (int)dy);
 		}
-
+		}
 
 	}
 	//Checks if tile is valid, and moves if possible
@@ -83,11 +89,11 @@ public class HiveBoy extends Entity{
 
 	//Determines if next tile to move is valid (not collidable)
 	private boolean ValidMovement(int dx, int dy) {
-		int tileWidth = currentMap.getTiledMap().getTileWidth();
+		int tileWidth = getMap().getTiledMap().getTileWidth();
 		tileX = dx/tileWidth + 1;
 		tileY = dy/tileWidth + 2;
-		int layerIndex = currentMap.getTiledMap().getLayerIndex("collision");
-		int tileID = currentMap.getTiledMap().getTileId(tileX, tileY, layerIndex);
+		int layerIndex = getMap().getTiledMap().getLayerIndex("collision");
+		int tileID = getMap().getTiledMap().getTileId(tileX, tileY, layerIndex);
 		if(tileID == 0) return true;
 		else return false;
 
@@ -95,8 +101,8 @@ public class HiveBoy extends Entity{
 	
 	public void drawHiveBoy() {
 		//Draws HiveBoy's still picture if he isn't moving
-		if(dx == 0 && dy == 0 && !isDigging)
-			currentStill.draw(getX(), getY(), scale);
+		if(dx == 0 && dy == 0 && !isDigging || inventorySelected)
+			getImage().draw(getX(), getY(), scale);
 		//Otherwise draws HiveBoy's animation based on his activity
 		else 	currentAnimation.draw(getX(), getY(), 
 				currentAnimation.getWidth()*scale, 
@@ -104,7 +110,21 @@ public class HiveBoy extends Entity{
 	}
 	
 	// Handles hiveboy's movement based on key press. Movement disrupts digging
-	public void tickHiveboyMovement(Input input) {
+	public void tickKeyHandler(Input input) {
+		
+		if(input.isKeyPressed(Input.KEY_TAB))
+			inventorySelected = !inventorySelected;
+		
+		if(inventorySelected){
+			
+			if(input.isKeyPressed(Input.KEY_RIGHT))
+				inventory.incrementSelected();
+			if(input.isKeyPressed(Input.KEY_LEFT))
+				inventory.decrementSelected();
+		}
+		
+		else{
+		
 		// Key left
 		if(input.isKeyDown(Input.KEY_LEFT)){
 			isLeft = true;
@@ -136,6 +156,7 @@ public class HiveBoy extends Entity{
 			isDigging = false; // TODO: create better way of disabling dig animation
 		}
 		else isUp = false;
+		}
 	}
 	public Animation getCurrentAnimation(){ return currentAnimation;}
 	public int getTileX(){
@@ -181,9 +202,6 @@ public class HiveBoy extends Entity{
 	public void setDx(float dx) {
 		this.dx = dx;
 	}
-	public Image getCurrentStill() {
-		return currentStill;
-	}
 	public void setFacing(int i) {
 		lastFacing = i;
 	}
@@ -196,8 +214,13 @@ public class HiveBoy extends Entity{
 	public int getFacing(){
 		return lastFacing;
 	}
-	public void setCurrentMap(MapInterface map){
-		currentMap = map;
+
+	public boolean getInventorySelected(){
+		return inventorySelected;
+	}
+	
+	public Inventory getInventory(){
+		return inventory;
 	}
 }
 
