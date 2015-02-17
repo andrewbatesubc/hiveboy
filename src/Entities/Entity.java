@@ -7,7 +7,9 @@ import Maps.MapInterface;
 
 public abstract class Entity {
 	private int x, y;
-	private MapInterface currentMap;
+	protected int entityID;
+	//0 = beeBox, 1 = seed
+	protected MapInterface currentMap;
 	private Image image;
 	private Rectangle collisionRectangle;
 	private float imageScale = 1;
@@ -30,7 +32,7 @@ public abstract class Entity {
 	
 	// Sets collision bounds for any entity
 	public void setBounds(){
-		collisionRectangle = new Rectangle(x, y, image.getWidth() * imageScale, image.getHeight() * imageScale);
+		collisionRectangle = new Rectangle(x, y, image.getWidth() * imageScale - 10, image.getHeight() * imageScale);
 	}
 	
 	public void updateBounds(){
@@ -57,5 +59,10 @@ public abstract class Entity {
 	public float getScale(){
 		return imageScale;
 	}
+	
+	public int getID(){
+		return entityID;
+	}
+	
 
 }

@@ -10,7 +10,7 @@ public class BeeBox extends Entity{
 	
 	public BeeBox(int x, int y, MainMap mainMap){
 		super(x, y, mainMap);
-		
+		entityID = 0;
 		try {
 			setImage(new Image("resources/images/hive/hive.png"), 2);
 			getImage().setFilter(Image.FILTER_NEAREST);

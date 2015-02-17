@@ -7,6 +7,7 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -14,7 +15,6 @@ import org.newdawn.slick.state.transition.EmptyTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.tiled.TiledMap;
 
-import Utilities.Inventory;
 import Entities.Bee;
 import Entities.BeeBox;
 import Entities.Entity;
@@ -35,123 +35,141 @@ public class MainMap extends BasicGameState implements MapInterface{
 	private ArrayList<Entity> toRender;
 	private StateBasedGame game;
 	private Input input;
-	private Seed seed;
+	private Seed[] seeds;
 	private Rectangle cameraRectangle;
+	private Sound doorOpen, doorClose;
 
-	
-
-	// Passes hiveboy reference to constructor, kept as global variable
 	public MainMap(HiveBoy mainBoy) {
 		super();
 		hiveBoy = mainBoy;
-
 	}
 
-	// Initializes all entities, adds tilemap, sets up Camera class to focus on hiveboy
 	@Override
 	public void init(GameContainer container, StateBasedGame game)
+			throws SlickException {
+		setupMap(container, game);
+		setupEntities();
+	}
+
+	private void setupEntities() {
+		seeds = new Seed[10];
+		bee = new Bee(86, 912, this);
+		beeBox = new BeeBox(72,924, this);
+		seeds[0] = new Seed(450, 915, this);
+		seeds[1] = new Seed(490, 915, this);
+		seeds[2] = new Seed(550, 915, this);
+		seeds[3] = new Seed(590, 915, this);
+		seeds[4] = new Seed(630, 915, this);
+		seeds[5] = new Seed(670, 915, this);
+		seeds[6] = new Seed(710, 915, this);
+		
+		for(int i = 0; i < 7; i++){
+			entities.add(seeds[i]);
+		}
+		entities.add(beeBox);
+	}
+
+	private void setupMap(GameContainer container, StateBasedGame game)
 			throws SlickException {
 		this.game = game;
 		hiveBoy.setMap(this);
 		entities = new ArrayList<Entity>();
 		addedTiles = new ArrayList<AddedTile>();
 		toRender = new ArrayList<Entity>();
-		seed = new Seed(79, 915, this);
-		bee = new Bee(86, 912, this);
-		beeBox = new BeeBox(72,924, this);
 		cameraRectangle = new Rectangle(0, 0, 800, 600);
 		tiledMap = new TiledMap("resources/tilemaps/testedits.tmx");
 		camera = new Camera(container, tiledMap, hiveBoy);
 		container.setTargetFrameRate(60);
 		container.setUpdateOnlyWhenVisible(false);
-		entities.add(seed);
-		entities.add(beeBox);
 		input = container.getInput();
-
-		
+		doorOpen = new Sound("resources/sounds/mainMap/doorOpen.wav");
+		doorClose = new Sound("resources/sounds/mainMap/doorClose.wav");
 	}
-	// Renders all render-able objects
+
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
-		
-		//TODO: populate arrayList of images that are currently on map, only render those
-		// Pass those as parameter to camera class and render them
-		
-		// Draws the map
-		camera.drawMap();
-
-		// Renders the current area HiveBoy is occupying
-		camera.translateGraphics();
-
-		// Draws all added dirt tiles
-		for(AddedTile tile : addedTiles){
-			tile.getImage().draw(tile.getX(), tile.getY());
-		}
-
-		// Draws HiveBoy
+		drawCamera();
+		drawAddedTiles();
 		hiveBoy.drawHiveBoy();
-		
-		// Draws a bee
-		bee.getCurrentAnimation().draw(bee.getX(), bee.getY());
-		
-		// Draw's a bee-box
-		//beeBox.getImage().draw(beeBox.getX(), beeBox.getY(), 2);
-		
+		drawBees();
+		drawEntities();
+	}
+
+	private void drawCamera() {
+		camera.drawMap();
+		camera.translateGraphics();
+	}
+
+	private void drawEntities() {
 		for(Entity e : toRender){
 			e.getImage().draw(e.getX(), e.getY(), e.getScale());
 		}
-		
+	}
 
+	private void drawBees() {
+		bee.getCurrentAnimation().draw(bee.getX(), bee.getY());
+	}
+
+	private void drawAddedTiles() {
+		for(AddedTile tile : addedTiles){
+			tile.getImage().draw(tile.getX(), tile.getY());
+		}
 	}
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
-		//Updates the camera rectangle to check to see which entites are eligible for rendering / collision
-		// detection
-		if(400 < hiveBoy.getX() && hiveBoy.getX() < 1200)
-		cameraRectangle.setCenterX(hiveBoy.getX());
-		if(300 < hiveBoy.getY() && hiveBoy.getY() < 1300)
-		cameraRectangle.setCenterY(hiveBoy.getY());
 		
-		//Empties list to render
+		updateCameraCollisionRectangle();
+		updateCollidableEntities();
+		checkDiggable();
+		tickHiveBoy(delta);
+		checkIfEnteredDoor(game);
+		centerCameraOnHiveBoy();
+	}
+
+	private void centerCameraOnHiveBoy() {
+		camera.centerOn(hiveBoy.getX(), hiveBoy.getY());
+	}
+
+	private void checkIfEnteredDoor(StateBasedGame game) {
+		if(checkDoor()){
+			input.pause();
+			doorOpen.play();
+			game.enterState(2, new FadeOutTransition(Color.black), new EmptyTransition());		
+			input.resume();
+		}
+	}
+
+	private void checkDiggable() {
+		if(input.isKeyPressed(Input.KEY_SPACE) && !hiveBoy.getDig()){
+			timeToDig();
+		}
+	}
+
+	private void tickHiveBoy(int delta) {
+		hiveBoy.tickSound(1);
+		hiveBoy.tickDig();
+		hiveBoy.tickAnimation();
+		hiveBoy.getCurrentAnimation().update(delta);
+		hiveBoy.tickKeyHandler(input);
+	}
+
+	private void updateCollidableEntities() {
 		toRender.clear();
-		
-		//Iterates through list of entities and moves entites currently in view to toRender list
 		for(Entity e : entities){
 			if(cameraRectangle.intersects(e.getRectangle()))
 				toRender.add(e);
 		}
-	
-		// Digs when on dirt patch in garden
-		if(input.isKeyPressed(Input.KEY_SPACE)){
-			pressedSpace();
-		}
-		
-	
-		// Updates hiveboy's current animation
-		hiveBoy.tickAnimation();
-		
-		// Ticks hiveboy Animation
-		hiveBoy.getCurrentAnimation().update(delta);
-
-
-		// Ticks hiveboy's Key Handler
-		hiveBoy.tickKeyHandler(input);
-
-		// Handles door entry event
-		if(checkDoor()){
-			input.pause();
-			game.enterState(2, new FadeOutTransition(Color.black), new EmptyTransition());		
-			input.resume();
-		}
-
-		// Centers camera on HiveBoy
-		camera.centerOn(hiveBoy.getX(), hiveBoy.getY());
-
 	}
 
-	// Handles entry to this map. Puts hiveboy in front of his door, updates current map
+	private void updateCameraCollisionRectangle() {
+		if(400 < hiveBoy.getX() && hiveBoy.getX() < 1200)
+		cameraRectangle.setCenterX(hiveBoy.getX());
+		if(300 < hiveBoy.getY() && hiveBoy.getY() < 1300)
+		cameraRectangle.setCenterY(hiveBoy.getY());
+	}
+
 	@Override
 	public void enter(GameContainer container, StateBasedGame game) throws SlickException {
 		super.enter(container, game);
@@ -159,9 +177,12 @@ public class MainMap extends BasicGameState implements MapInterface{
 		hiveBoy.setX(340);
 		hiveBoy.setY(850);
 		hiveBoy.setCollidable(toRender);
+		doorClose.play();
 	}
+	
 
-	// Checks to see if hiveboy has collided with door, if so, transitions to house map
+	
+
 	private boolean checkDoor() {
 		int enterHouseCheckIndex = tiledMap.getLayerIndex("enterHouse");
 		int enterID = tiledMap.getTileId(hiveBoy.getTileX(), hiveBoy.getTileY(), enterHouseCheckIndex);
@@ -172,11 +193,9 @@ public class MainMap extends BasicGameState implements MapInterface{
 
 	public TiledMap getTiledMap(){return tiledMap;}
 	public ArrayList getAddedTiles(){return addedTiles;}
-	
-	// Indicates which map you are currently on by unique map ID
+
 	@Override
 	public int getID() {
-		// TODO Auto-generated method stub
 		return 1;
 	}
 
@@ -185,13 +204,11 @@ public class MainMap extends BasicGameState implements MapInterface{
 		return game;
 	}
 
-	// Verifies that hiveboy is indeed on diggable dirt, then digs and updates animation
-	public void pressedSpace() {
+	public void timeToDig(){
 		int checkDirt = tiledMap.getLayerIndex("diggable");
 		int enterID = tiledMap.getTileId(hiveBoy.getTileX(), hiveBoy.getTileY(), checkDirt);
 		if(enterID !=0){
-			hiveBoy.setDigging(true);
-			//Digs dirt at current tile if in garden
+			hiveBoy.startDigging(System.nanoTime());
 			DirtTile tile = null;
 			tile = new DirtTile(hiveBoy.getTileX() * 32, hiveBoy.getTileY() * 32, this);
 
@@ -199,6 +216,11 @@ public class MainMap extends BasicGameState implements MapInterface{
 				addedTiles.add(tile);
 		}
 
+	}
+
+	@Override
+	public ArrayList<Entity> returnEntities() {
+		return entities;
 	}
 
 
