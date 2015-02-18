@@ -16,6 +16,8 @@ import org.newdawn.slick.tiled.TiledMap;
 
 import Entities.Entity;
 import Entities.HiveBoy;
+import Entities.Shovel;
+import Entities.Sprinkler;
 
 public class House extends BasicGameState implements MapInterface{
 	private HiveBoy hiveBoy;
@@ -51,6 +53,12 @@ public class House extends BasicGameState implements MapInterface{
 		container.setUpdateOnlyWhenVisible(false);
 		doorOpen = new Sound("resources/sounds/mainMap/doorOpen.wav");
 		doorClose = new Sound("resources/sounds/mainMap/doorClose.wav");
+		entities = new ArrayList<Entity>();
+		Shovel shovel = new Shovel(600, 350, this);
+		Sprinkler sprinkler = new Sprinkler(550, 350, this);
+		entities.add(shovel);
+		entities.add(sprinkler);
+		
 	}
 	
 	@Override
@@ -68,7 +76,17 @@ public class House extends BasicGameState implements MapInterface{
 			throws SlickException {
 		drawCamera();
 		hiveBoy.drawHiveBoy();
+		drawEntities();
+		
 
+	}
+
+
+	private void drawEntities() {
+		for(Entity e : entities){
+			e.getImage().draw(e.getX(), e.getY(), e.getScale());
+			
+		}
 	}
 
 
@@ -83,6 +101,7 @@ public class House extends BasicGameState implements MapInterface{
 		tickHiveBoy(delta);
 		checkIfEnteredDoor(game);
 		centerCameraOnHiveBoy();
+		hiveBoy.setCollidable(entities);
 	}
 
 

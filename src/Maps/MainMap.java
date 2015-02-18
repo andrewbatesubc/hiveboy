@@ -20,8 +20,11 @@ import Entities.BeeBox;
 import Entities.Entity;
 import Entities.HiveBoy;
 import Entities.Seed;
+import Entities.Shovel;
+import Entities.Sprinkler;
 import Entities.AddedTiles.AddedTile;
 import Entities.AddedTiles.DirtTile;
+import Entities.AddedTiles.SeedTile;
 
 public class MainMap extends BasicGameState implements MapInterface{
 
@@ -56,14 +59,12 @@ public class MainMap extends BasicGameState implements MapInterface{
 		bee = new Bee(86, 912, this);
 		beeBox = new BeeBox(72,924, this);
 		seeds[0] = new Seed(450, 915, this);
-		seeds[1] = new Seed(490, 915, this);
-		seeds[2] = new Seed(550, 915, this);
-		seeds[3] = new Seed(590, 915, this);
-		seeds[4] = new Seed(630, 915, this);
-		seeds[5] = new Seed(670, 915, this);
-		seeds[6] = new Seed(710, 915, this);
-		
-		for(int i = 0; i < 7; i++){
+		seeds[1] = new Seed(310, 1015, this);
+		seeds[2] = new Seed(590, 945, this);
+		seeds[3] = new Seed(630, 1015, this);
+		seeds[4] = new Seed(350, 935, this);
+
+		for(int i = 0; i < 5; i++){
 			entities.add(seeds[i]);
 		}
 		entities.add(beeBox);
@@ -89,11 +90,13 @@ public class MainMap extends BasicGameState implements MapInterface{
 	@Override
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
+
 		drawCamera();
 		drawAddedTiles();
 		hiveBoy.drawHiveBoy();
 		drawBees();
 		drawEntities();
+
 	}
 
 	private void drawCamera() {
@@ -119,7 +122,7 @@ public class MainMap extends BasicGameState implements MapInterface{
 	@Override
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
-		
+
 		updateCameraCollisionRectangle();
 		updateCollidableEntities();
 		checkDiggable();
@@ -149,7 +152,7 @@ public class MainMap extends BasicGameState implements MapInterface{
 
 	private void tickHiveBoy(int delta) {
 		hiveBoy.tickSound(1);
-		hiveBoy.tickDig();
+		hiveBoy.tickBusy();
 		hiveBoy.tickAnimation();
 		hiveBoy.getCurrentAnimation().update(delta);
 		hiveBoy.tickKeyHandler(input);
@@ -165,9 +168,9 @@ public class MainMap extends BasicGameState implements MapInterface{
 
 	private void updateCameraCollisionRectangle() {
 		if(400 < hiveBoy.getX() && hiveBoy.getX() < 1200)
-		cameraRectangle.setCenterX(hiveBoy.getX());
+			cameraRectangle.setCenterX(hiveBoy.getX());
 		if(300 < hiveBoy.getY() && hiveBoy.getY() < 1300)
-		cameraRectangle.setCenterY(hiveBoy.getY());
+			cameraRectangle.setCenterY(hiveBoy.getY());
 	}
 
 	@Override
@@ -179,9 +182,9 @@ public class MainMap extends BasicGameState implements MapInterface{
 		hiveBoy.setCollidable(toRender);
 		doorClose.play();
 	}
-	
 
-	
+
+
 
 	private boolean checkDoor() {
 		int enterHouseCheckIndex = tiledMap.getLayerIndex("enterHouse");
@@ -208,15 +211,68 @@ public class MainMap extends BasicGameState implements MapInterface{
 		int checkDirt = tiledMap.getLayerIndex("diggable");
 		int enterID = tiledMap.getTileId(hiveBoy.getTileX(), hiveBoy.getTileY(), checkDirt);
 		if(enterID !=0){
-			hiveBoy.startDigging(System.nanoTime());
-			DirtTile tile = null;
-			tile = new DirtTile(hiveBoy.getTileX() * 32, hiveBoy.getTileY() * 32, this);
 
-			if(tile != null && !getAddedTiles().contains(tile))
-				addedTiles.add(tile);
+			AddedTile tileStandingOn = null;
+			for(AddedTile tile: addedTiles){
+				if(tile.getX()/32 == hiveBoy.getTileX() && tile.getY()/32 == hiveBoy.getTileY()){
+					tileStandingOn = tile;
+					break;
+				}
+			}
+
+			Entity inventoryItem =  hiveBoy.getInventory().getSelectedItem();
+			if(inventoryItem == null){
+				startCrying();
+			}
+
+			else{
+				if(tileStandingOn == null){
+					if(inventoryItem.getClass().equals(Shovel.class)){
+						beginDigging();
+					}
+					else startCrying();
+				}
+
+				else if(tileStandingOn.getClass().equals(DirtTile.class)){
+					if(inventoryItem.getClass().equals(Seed.class)){
+						plantSeeds(tileStandingOn);
+					}
+					else startCrying();
+				}
+				else if(tileStandingOn.getClass().equals(SeedTile.class)){
+					if(!((SeedTile) tileStandingOn).isWatered() && inventoryItem.getClass().equals(Sprinkler.class)){
+						((SeedTile) tileStandingOn).toggleWatered();
+						hiveBoy.startBusy(System.nanoTime());
+						hiveBoy.setCurrentAction("watering");
+					}
+				}
+			}
 		}
-
 	}
+
+	private void plantSeeds(AddedTile tileStandingOn) {
+		hiveBoy.startBusy(System.nanoTime());
+		hiveBoy.setCurrentAction("planting");
+		addedTiles.remove(tileStandingOn);
+		SeedTile seedTile = new SeedTile(tileStandingOn.getX(), tileStandingOn.getY(), this);
+		addedTiles.add(seedTile);
+		hiveBoy.getInventory().removeCurrentlySelectedItem();
+	}
+
+	private void beginDigging() {
+		hiveBoy.startBusy(System.nanoTime());
+		hiveBoy.setCurrentAction("digging");
+		DirtTile tile = new DirtTile(hiveBoy.getTileX() * 32, hiveBoy.getTileY() * 32, this);
+		if(tile != null && !getAddedTiles().contains(tile))
+			addedTiles.add(tile);
+	}
+
+	private void startCrying() {
+		hiveBoy.setCurrentAction("crying");
+		hiveBoy.startBusy(System.nanoTime());
+	}
+
+
 
 	@Override
 	public ArrayList<Entity> returnEntities() {

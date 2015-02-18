@@ -20,7 +20,7 @@ public class Start extends StateBasedGame{
 	@Override
 	public void initStatesList(GameContainer container) throws SlickException {
 		mainBoy = new HiveBoy(340, 850, null);
-		//addState(new IntroScreen());
+		addState(new IntroScreen());
 		addState(new MainMap(mainBoy));
 		addState(new House(mainBoy));
 		

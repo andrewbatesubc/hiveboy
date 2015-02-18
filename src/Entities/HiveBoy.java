@@ -17,16 +17,17 @@ public class HiveBoy extends Entity{
 
 
 	private boolean isLeft = false, isRight = false, isDown = false, isUp = false, 
-			isDigging = false, inventorySelected = false, isMoving = false;
+			isBusy = false, inventorySelected = false, isMoving = false;
 	private float dx = 0, dy = 0, moveSpeed = 2, scale = 2;
-	private long digTimer = 0;
+	private long busyTimer = 0;
 	private int animSpeed = 200, lastFacing = 0,tileX, tileY;
-	private SpriteSheet backSheet, forwardSheet, leftSheet, rightSheet, digSheet;
+	private String currentAction = "";
+	private SpriteSheet backSheet, forwardSheet, leftSheet, rightSheet, digSheet, crySheet, waterSheet, throwSeedSheet;
 	private Image backStill, forwardStill, leftStill, rightStill;
-	private Animation backWalk, forwardWalk, leftWalk, rightWalk, currentAnimation, dig;
+	private Animation backWalk, forwardWalk, leftWalk, rightWalk, currentAnimation, dig, cry, water, throwSeeds;
 	private Inventory inventory;
 	private ArrayList<Entity> collidable;
-	private Sound digSound, grassStep, woodStep, inventorySelect, makeSelection, pickup;
+	private Sound digSound, grassStep, woodStep, inventorySelect, makeSelection, pickup, seedSound, crySound, sprinklerSound;
 	private Entity collidedWith;
 
 
@@ -45,6 +46,9 @@ public class HiveBoy extends Entity{
 			inventorySelect = new Sound("resources/sounds/mainMap/inventorySelect.wav");
 			makeSelection = new Sound("resources/sounds/mainMap/makeSelection.wav");
 			pickup = new Sound("resources/sounds/mainMap/pickup.wav");
+			seedSound = new Sound("resources/sounds/mainMap/seeds.wav");
+			crySound = new Sound("resources/sounds/mainMap/crying.wav");
+			sprinklerSound = new Sound("resources/sounds/mainMap/sprinkler.wav");
 
 		} catch (SlickException e) {
 			e.printStackTrace();
@@ -59,6 +63,9 @@ public class HiveBoy extends Entity{
 			leftSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_sideways_left.png", 32, 32);
 			rightSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_sideways_right.png", 32, 32);
 			digSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_dig.png", 32, 32);
+			crySheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_sad.png", 32, 32);
+			waterSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboyWatering.png", 32, 32);
+			throwSeedSheet = new SpriteSheet("resources/spritesheets/hiveboy/hiveboy_throwingSeeds.png", 32, 32);
 			backStill = new Image("resources/images/hiveboy/hiveboy_backside_still.png");
 			backStill.setFilter(Image.FILTER_NEAREST);
 			forwardStill = new Image("resources/images/hiveboy/hiveboy_still_forward.png");
@@ -75,6 +82,9 @@ public class HiveBoy extends Entity{
 			leftWalk = new Animation(leftSheet, animSpeed);
 			rightWalk = new Animation(rightSheet, animSpeed);
 			dig = new Animation(digSheet, animSpeed*3);
+			cry = new Animation(crySheet, animSpeed*3);
+			water = new Animation(waterSheet, animSpeed*3);
+			throwSeeds = new Animation(throwSeedSheet, animSpeed*3);
 			currentAnimation = forwardWalk;
 
 		} catch (SlickException e) {
@@ -89,7 +99,16 @@ public class HiveBoy extends Entity{
 
 	private void nextHiveBoyImage() {
 		if(!inventorySelected){
-			if(isDigging){currentAnimation = dig;}
+			if(isBusy){
+				if(currentAction.equals("digging"))
+					currentAnimation = dig;
+				else if(currentAction.equals("watering"))
+					currentAnimation = water;
+				else if(currentAction.equals("crying"))
+					currentAnimation = cry;
+				else if(currentAction.equals("planting"))
+					currentAnimation = throwSeeds;
+			}
 
 			else {
 				if(isRight) {dx = moveSpeed; currentAnimation = rightWalk; setImage(rightStill, scale); }
@@ -111,7 +130,7 @@ public class HiveBoy extends Entity{
 	}
 
 	private void MovePlayer(int dx, int dy) {
-		if(ValidMovement(dx, dy) && !isDigging){
+		if(ValidMovement(dx, dy) && !isBusy){
 			setX(dx);
 			setY(dy);
 		}
@@ -147,7 +166,7 @@ public class HiveBoy extends Entity{
 
 	public void drawHiveBoy() {
 		//Draws HiveBoy's still picture if he isn't moving
-		if(dx == 0 && dy == 0 && !isDigging || inventorySelected)
+		if(dx == 0 && dy == 0 && !isBusy || inventorySelected)
 			getImage().draw(getX(), getY(), scale);
 		//Otherwise draws HiveBoy's animation based on his activity
 		else 	currentAnimation.draw(getX(), getY(), 
@@ -168,7 +187,7 @@ public class HiveBoy extends Entity{
 			handleInventoryKeys(input);
 		}
 
-		else if(isDigging){
+		else if(isBusy){
 			dx = 0;
 			dy = 0;
 			setImage(forwardStill, 2);
@@ -274,10 +293,10 @@ public class HiveBoy extends Entity{
 		lastFacing = i;
 	}
 	public boolean getDig() {
-		return isDigging;
+		return isBusy;
 	}
 	public void setDigging(boolean b) {
-		isDigging = b;
+		isBusy = b;
 	}
 	public int getFacing(){
 		return lastFacing;
@@ -294,30 +313,49 @@ public class HiveBoy extends Entity{
 		collidable = list;
 	}
 
-	public void startDigging(long nanoTime) {
-		digTimer = nanoTime;
-		isDigging = true;
+	public void startBusy(long nanoTime) {
+		busyTimer = nanoTime;
+		isBusy = true;
 	}
 
-	public void tickDig() {
-		if(System.nanoTime() - digTimer > 2000000000)
-			isDigging = false;
+	public void tickBusy() {
+		if(currentAction.equals("digging")){
+			if(System.nanoTime() - busyTimer > 2000000000)
+				isBusy = false;
+		}
+		else if (System.nanoTime() - busyTimer > 1000000000)
+			isBusy = false;
 
 	}
 
 	public void tickSound(int mapCode) {
 		if(mapCode == 1){
-			if(isDigging && !digSound.playing())
-				digSound.play();
+			if(isBusy){
+				if(currentAction.equals("digging") && !digSound.playing())
+					digSound.play();
+				else if(currentAction.equals("crying") && !crySound.playing())
+					crySound.play();
+				else if(currentAction.equals("watering") && !sprinklerSound.playing())
+					sprinklerSound.play();
+				else if(currentAction.equals("planting") && !seedSound.playing())
+					seedSound.play();
+			}
+
 			else if(isMoving && !grassStep.playing())
 				grassStep.play();
 		}
-
 		else if(mapCode == 2){
 			if(isMoving && !woodStep.playing())
 				woodStep.play();
 		}
+	}
 
+	public String getCurrentAction() {
+		return currentAction;
+	}
+
+	public void setCurrentAction(String currentAction) {
+		this.currentAction = currentAction;
 	}
 }
 

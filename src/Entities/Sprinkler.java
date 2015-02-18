@@ -3,17 +3,15 @@ package Entities;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import Maps.MainMap;
 import Maps.MapInterface;
 
-public class Seed extends Entity{
+public class Sprinkler extends Entity{
 
-
-	public Seed(int x, int y, MapInterface mainMap) {
-		super(x, y, mainMap);
-		entityID = 1;
+	public Sprinkler(int x, int y, MapInterface currentMap) {
+		super(x, y, currentMap);
+		entityID = 3;
 		try {
-			setImage(new Image("resources/images/mainMap/seeds.png"), 1);
+			setImage(new Image("resources/images/mainMap/waterSprinkler.png"), 1);
 			getImage().setFilter(Image.FILTER_NEAREST);
 			setBounds();
 			
@@ -23,5 +21,4 @@ public class Seed extends Entity{
 		}
 		
 	}
-
 }
